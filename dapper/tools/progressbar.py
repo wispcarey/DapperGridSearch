@@ -12,7 +12,7 @@ from tqdm.auto import tqdm
 disable_progbar = "pytest" in sys.modules
 disable_user_interaction = "pytest" in sys.modules
 
-disable_progbar=True
+# disable_progbar=True
 
 
 def _interaction_impossible():

@@ -69,13 +69,14 @@ def main(grid_search_info):
             for i in range(4):
                 result_record[trial_ind, i, :] = data[i]
         
-        nan_val_count = np.sum(~np.isnan(result_record), axis=0)
-        safe_nan_val_count = np.where(nan_val_count == 0, 1, nan_val_count)
+        valid_val_count = np.sum(~np.isnan(result_record), axis=0)
+        safe_valid_val_count = np.where(valid_val_count == 0, 1, valid_val_count)
         result_record[np.isnan(result_record)] = 0
-        result_avg = np.sum(result_record, axis=0) / safe_nan_val_count
-        result_avg[nan_val_count == 0] = np.nan
+        result_avg = np.sum(result_record, axis=0) / safe_valid_val_count
+        result_avg[valid_val_count == 0] = np.nan
+        print(result_record)
 
-        return result_avg
+        return result_avg, valid_val_count[0, :]
 
     for dataset, info in grid_search_info.items():
         for sigma_y in info['sigma_y']:
@@ -183,15 +184,22 @@ def main(grid_search_info):
                     K = len(xps)
                     
                     results = Parallel(n_jobs=-1)(delayed(_process_trial)(trial_ind) for trial_ind in range(GRID_SEARCH_INFO[dataset]["num_trials"]))
-                    result_avg = _combine_results(results)
+                    result_avg, valid_val_count = _combine_results(results)
                     exp_info, _, _ = xps.prep_table()
 
-                    best_rmse_ind = np.argmin(result_avg[0,:])
+                    best_rmse_ind = np.nanargmin(result_avg[0,:])
+                    
+                    print(result_avg, best_rmse_ind, valid_val_count)
                     
                     if loc_rad_list:
                         best_loc_rad = exp_info['loc_rad'][best_rmse_ind]
                     else:
                         best_loc_rad = ""
+                    
+                    if valid_val_count[best_rmse_ind] < GRID_SEARCH_INFO[dataset]["num_trials"]:
+                        nan_exist = True
+                    else:
+                        nan_exist = False
 
                     df = pd.DataFrame({
                         "method": [method_name],
@@ -202,7 +210,8 @@ def main(grid_search_info):
                         "rmse_mean": [result_avg[0, best_rmse_ind]],
                         "rmse_std": [result_avg[1, best_rmse_ind]],
                         "rmv_mean": [result_avg[2, best_rmse_ind]],  
-                        "rmv_std": [result_avg[3, best_rmse_ind]]     
+                        "rmv_std": [result_avg[3, best_rmse_ind]],
+                        "nan_exist": nan_exist     
                     })
 
                     csv_file = os.path.join("save", f"benchmarks_{dataset}.csv")
@@ -219,5 +228,5 @@ def main(grid_search_info):
                     # print("Results saved to:", csv_file)
 
 if __name__ == "__main__":
-    disable_progbar=True
+    # disable_progbar=True
     main(GRID_SEARCH_INFO)
