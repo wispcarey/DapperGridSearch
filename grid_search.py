@@ -4,6 +4,7 @@ import re
 import pandas as pd
 import os
 import math
+import matplotlib.pyplot as plt
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -14,6 +15,104 @@ from dapper.mods.Lorenz96 import LPs
 from dapper.tools.progressbar import disable_progbar
 
 from grid_search_config import GRID_SEARCH_INFO
+
+def plot_heatmap_with_nan(data, x_list, y_list, save_path=None, img_title="Grid Search"):
+    """
+    Plots a heatmap with NaN values handled and saves it to a specified path.
+
+    Parameters:
+        data (numpy.ndarray): 2D array of data values (NaN values are allowed).
+        x_list (list or numpy.ndarray): List of values for the x-axis (corresponding to rows of data).
+        y_list (list or numpy.ndarray): List of values for the y-axis (corresponding to columns of data).
+        save_path (str): File path to save the plot.
+
+    Returns:
+        None
+    """
+    # Validate dimensions
+    if data.shape[0] != len(x_list):
+        raise ValueError("The length of x_list must match the number of rows in data.")
+    if data.shape[1] != len(y_list):
+        raise ValueError("The length of y_list must match the number of columns in data.")
+
+    # Replace NaN with a value greater than the maximum
+    max_value = np.nanmax(data)
+    nan_value = max_value * 1.1  # Set NaN to 1.1 times the max value
+    data_with_nan_replaced = np.where(np.isnan(data), nan_value, data)
+
+    # Create grid edges (for pcolormesh)
+    x_edges = np.linspace(x_list[0] - (x_list[1] - x_list[0]) / 2, 
+                          x_list[-1] + (x_list[1] - x_list[0]) / 2, len(x_list) + 1)
+    y_edges = np.linspace(y_list[0] - (y_list[1] - y_list[0]) / 2, 
+                          y_list[-1] + (y_list[1] - y_list[0]) / 2, len(y_list) + 1)
+
+    # Use the 'jet' colormap
+    cmap = plt.cm.jet
+
+    # Plot the heatmap
+    plt.figure(figsize=(8, 6))
+    mesh = plt.pcolormesh(y_edges, x_edges, data_with_nan_replaced, cmap=cmap, shading='auto')
+
+    # Add a colorbar
+    cbar = plt.colorbar(mesh)
+    cbar.set_label("Values", fontsize=15)
+
+    # Adjust colorbar ticks to include NaN
+    cbar_ticks = np.linspace(np.nanmin(data), max_value, num=6)  # Generate ticks for original data range
+    cbar_ticks = np.append(cbar_ticks, nan_value)  # Add NaN as the last tick
+    cbar.set_ticks(cbar_ticks)
+    cbar.set_ticklabels([f"{tick:.2f}" for tick in cbar_ticks[:-1]] + ["NaN"])  # Add "NaN" label
+    cbar.ax.tick_params(labelsize=15)
+
+    # Explicitly set ticks and labels
+    plt.xticks(ticks=y_list, labels=[f"{y_list[0]:.3f}"] + [f"{val:.0f}" for val in y_list[1:]], fontsize=15)
+    plt.yticks(ticks=x_list, labels=[f"{val:.2f}" for val in x_list], fontsize=15)
+
+    # Label axes
+    plt.xlabel("Localization Radius", fontsize=15)
+    plt.ylabel("Inflation Factors", fontsize=15)
+
+    # Set title
+    plt.title(img_title, fontsize=18)
+
+    # Save the plot
+    if save_path:
+        plt.savefig(save_path, dpi=200, bbox_inches='tight')  # Save plot to file
+    plt.close()  # Close the plot to release memory
+
+def plot_simple(x, y, save_path=None, img_title="Infl Search"):
+    """
+    Plots a simple 2D line plot for two arrays.
+
+    Parameters:
+        x (list or numpy.ndarray): Array of x-axis values.
+        y (list or numpy.ndarray): Array of y-axis values.
+        title (str): Title of the plot. Default is "Simple Plot".
+        x_label (str): Label for the x-axis. Default is "X-Axis".
+        y_label (str): Label for the y-axis. Default is "Y-Axis".
+        save_path (str): File path to save the plot. If None, plot is shown instead.
+
+    Returns:
+        None
+    """
+    # Plot the data
+    plt.figure(figsize=(8, 6))
+    plt.plot(x, y, marker='o', linestyle='-', color='b')  # Line with markers
+
+    # Add labels and title
+    plt.title(img_title, fontsize=18)
+    plt.xlabel("Inflation Factors", fontsize=15)
+    plt.ylabel("RMSE", fontsize=15)
+
+    plt.xticks(ticks=x, labels=[f"{val:.2f}" for val in x], fontsize=15)
+    plt.yticks(fontsize=15)
+
+    # Save or show the plot
+    if save_path:
+        plt.savefig(save_path, dpi=200, bbox_inches='tight')  # Save plot to file
+    plt.close()  # Close the plot to release memory
+
+
 
 def main(grid_search_info):
     def _process_trial(trial_ind):
@@ -185,6 +284,21 @@ def main(grid_search_info):
                     
                     results = Parallel(n_jobs=-1)(delayed(_process_trial)(trial_ind) for trial_ind in range(GRID_SEARCH_INFO[dataset]["num_trials"]))
                     result_avg, valid_val_count = _combine_results(results)
+
+                    data_save_path = os.path.join('save', 'data', f'{dataset}_{method_name}_{N}_results.npz')
+                    np.savez(data_save_path, result_avg=result_avg, valid_val_count=valid_val_count, infl_list=infl_list, loc_rad_list=loc_rad_list)
+
+                    if loc_rad_list:
+                        rmse_avg_grid = result_avg[0, :].reshape(len(infl_list), len(loc_rad_list))
+                        img_save_path = os.path.join('save', 'figures', f'{dataset}_{method_name}_{N}_gridsearch.png')
+                        img_title = f"{method_name} Grid Search with Ensemble Size {N}"
+                        plot_heatmap_with_nan(rmse_avg_grid, infl_list, loc_rad_list, save_path=img_save_path, img_title=img_title)
+                    else:
+                        rmse_avg_grid = result_avg[0, :]
+                        img_save_path = os.path.join('save', 'figures', f'{dataset}_{method_name}_{N}_gridsearch.png')
+                        img_title = f"{method_name} Parameter Search with Ensemble Size {N}"
+                        plot_simple(infl_list, rmse_avg_grid, save_path=img_save_path, img_title=img_title)
+                        
                     exp_info, _, _ = xps.prep_table()
 
                     best_rmse_ind = np.nanargmin(result_avg[0,:])
