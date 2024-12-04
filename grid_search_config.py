@@ -13,10 +13,10 @@ KS_INFL = {5: [1 + 0.1*i for i in range(21)],
            100: [1 + 0.01*i for i in range(11)],
            }
 
-KS_INFL_LETKF = {5: [1 + 0.05*i for i in range(11)],
+KS_INFL_LETKF = {5: [1 + 0.03*i for i in range(11)],
            10: [1 + 0.03*i for i in range(11)],
-           15: [1 + 0.03*i for i in range(21)],
-           20: [1 + 0.02*i for i in range(21)],
+           15: [1 + 0.03*i for i in range(11)],
+           20: [1 + 0.02*i for i in range(11)],
            40: [1 + 0.02*i for i in range(11)],
            60: [1 + 0.015*i for i in range(11)],
            100: [1 + 0.01*i for i in range(11)],

@@ -173,62 +173,182 @@ def plot_simple(x, y, save_path=None, img_title="Infl Search"):
         plt.show()  # Show plot interactively
     plt.close()  # Close the plot to release memory
 
+def create_HMM(dataset, sigma_y):
+    """
+    Create a Hidden Markov Model (HMM) based on the specified dataset.
+
+    Parameters:
+    -----------
+    dataset : str
+        Name of the dataset ('ks', 'lorenz96', 'lorenz63').
+    sigma_y : float
+        Observation noise standard deviation.
+
+    Returns:
+    --------
+    HMM : modelling.HiddenMarkovModel
+        The created Hidden Markov Model for the specified dataset.
+    """
+    if dataset == 'ks':
+        from dapper.mods.KS import Model, Tplot
+        
+        KS = Model(dt=GRID_SEARCH_INFO[dataset]["dt"])
+        Nx = KS.Nx
+
+        tseq = modelling.Chronology(
+            dt=GRID_SEARCH_INFO[dataset]["dt"],
+            dto=GRID_SEARCH_INFO[dataset]["dto"],
+            Ko=GRID_SEARCH_INFO[dataset]["ko"],
+            BurnIn=1000,
+            Tplot=Tplot
+        )
+
+        Dyn = {
+            "M": Nx,
+            "model": KS.step,
+            "linear": KS.dstep_dx,
+            "noise": 0,
+        }
+
+        X0 = modelling.GaussRV(mu=KS.x0, C=1)
+
+        jj = GRID_SEARCH_INFO[dataset]["obs_inds"]
+        Obs = modelling.partial_Id_Obs(Nx, jj)
+        Obs["noise"] = sigma_y ** 2
+        Obs["localizer"] = nd_Id_localization((Nx,), (4,), jj)
+
+        HMM = modelling.HiddenMarkovModel(Dyn, Obs, tseq, X0)
+
+    elif dataset == 'lorenz96':
+        from dapper.mods.Lorenz96 import Tplot, dstep_dx, step, x0
+        
+        tseq = modelling.Chronology(
+            dt=GRID_SEARCH_INFO[dataset]["dt"],
+            dto=GRID_SEARCH_INFO[dataset]["dto"],
+            Ko=GRID_SEARCH_INFO[dataset]["ko"],
+            Tplot=Tplot,
+            BurnIn=2 * Tplot
+        )
+        
+        Nx = 40
+        x0 = x0(Nx)
+
+        Dyn = {
+            "M": Nx,
+            "model": step,
+            "linear": dstep_dx,
+            "noise": 0,
+        }
+
+        X0 = modelling.GaussRV(mu=x0, C=0.1)
+
+        jj = GRID_SEARCH_INFO[dataset]["obs_inds"]
+        Obs = modelling.partial_Id_Obs(Nx, jj)
+        Obs["noise"] = sigma_y ** 2
+        Obs["localizer"] = nd_Id_localization((Nx,), (2,), jj)
+
+        HMM = modelling.HiddenMarkovModel(Dyn, Obs, tseq, X0)
+
+    elif dataset == 'lorenz63':
+        from dapper.mods.Lorenz63 import LPs, Tplot, dstep_dx, step, x0
+
+        tseq = modelling.Chronology(
+            dt=GRID_SEARCH_INFO[dataset]["dt"],
+            dto=GRID_SEARCH_INFO[dataset]["dto"],
+            Ko=GRID_SEARCH_INFO[dataset]["ko"],
+            Tplot=Tplot,
+            BurnIn=4 * Tplot
+        )
+        
+        Nx = len(x0)
+
+        Dyn = {
+            "M": Nx,
+            "model": step,
+            "linear": dstep_dx,
+            "noise": 0,
+        }
+
+        X0 = modelling.GaussRV(mu=x0, C=1)
+
+        jj = GRID_SEARCH_INFO[dataset]["obs_inds"]
+        Obs = modelling.partial_Id_Obs(Nx, jj)
+        Obs["noise"] = sigma_y ** 2
+
+        HMM = modelling.HiddenMarkovModel(Dyn, Obs, tseq, X0)
+
+    else:
+        raise ValueError(f"Unknown dataset: {dataset}")
+
+    return HMM
+
 
 
 def main(grid_search_info):
     def _process_trial(trial_ind):
+        # with suppress_output():
+        for xp in xps:
+            xp.seed = trial_ind + 1
+        
         with suppress_output():
-            for xp in xps:
-                xp.seed = trial_ind + 1
-                
             save_as = xps.launch(HMM, liveplots=False, save_as=f"noname_{trial_ind}")
 
-            averages = dpr.stats.tabulate_avrgs([C.avrgs for C in xps])
+        averages = dpr.stats.tabulate_avrgs([C.avrgs for C in xps])
+        
+        
+        try:
+            # Find the first key that contains 'rmsea'
+            rmse_a_key = [key for key in averages.keys() if 'rmse.a' in key][0]
+        except Exception as e:
+            # If not found, print available keys
+            print("Exception message:", e)
+            print("Available keys:", averages.keys())
 
-            rmse_a_key = [key for key in averages.keys() if key.startswith('rmse.a')][0]
-            
-            try:
-                rmv_a_key = [key for key in averages.keys() if key.startswith('rmv.a')][0]
-            except Exception as e:
-                print("Exception message:", e)
-                print(f"Error trial: {method_name} on {dataset} with sigma_y = {sigma_y}, ensemble size {N}")
-                print(averages.keys())
-                rmv_a_key = rmse_a_key
+        try:
+            # Find the first key that contains 'rmva'
+            rmv_a_key = [key for key in averages.keys() if 'rmv.a' in key][0]
+        except Exception as e:
+            # If not found, log error details and set rmv_a_key to rmse_a_key
+            print("Exception message:", e)
+            print(f"Error trial: {method_name} on {dataset} with sigma_y = {sigma_y}, ensemble size = {N}")
+            print("Available keys:", averages.keys())
+            rmv_a_key = rmse_a_key
 
 
-            rmse_mean, rmse_std, rmv_mean, rmv_std = [], [], [], []
 
-            for entry in averages[rmse_a_key]:
-                clean_entry = entry.replace('␣', '').strip()
-                if 'nan' in clean_entry.lower():
-                    rmse_mean.append(float('nan'))
-                    rmse_std.append(float('nan'))                                  
-                else:
-                    match = re.match(r'([0-9.]+)\s*±\s*([0-9.]+)', clean_entry)
-                    if match:
-                        rmse_mean.append(float(match.group(1)))
-                        rmse_std.append(float(match.group(2)))
-            
-            # Convert lists to numpy arrays for efficient computation
-            rmse_mean = np.array(rmse_mean)
-            rmse_std = np.array(rmse_std)
-                        
-            for entry in averages[rmv_a_key]:
-                clean_entry = entry.replace('␣', '').strip()
-                if 'nan' in clean_entry.lower():
-                    rmv_mean.append(float('nan'))
-                    rmv_std.append(float('nan'))
-                else:
-                    match = re.match(r'([0-9.]+)\s*±\s*([0-9.]+)', clean_entry)
-                    if match:
-                        rmv_mean.append(float(match.group(1)))
-                        rmv_std.append(float(match.group(2)))
-            
-            # Convert rmv_mean and rmv_std to numpy arrays
-            rmv_mean = np.array(rmv_mean)
-            rmv_std = np.array(rmv_std)
-            
-            return rmse_mean, rmse_std, rmv_mean, rmv_std
+        rmse_mean, rmse_std, rmv_mean, rmv_std = [], [], [], []
+
+        for entry in averages[rmse_a_key]:
+            clean_entry = entry.replace('␣', '').strip()
+            if 'nan' in clean_entry.lower():
+                rmse_mean.append(float('nan'))
+                rmse_std.append(float('nan'))                                  
+            else:
+                match = re.match(r'([0-9.]+)\s*±\s*([0-9.]+)', clean_entry)
+                if match:
+                    rmse_mean.append(float(match.group(1)))
+                    rmse_std.append(float(match.group(2)))
+        
+        # Convert lists to numpy arrays for efficient computation
+        rmse_mean = np.array(rmse_mean)
+        rmse_std = np.array(rmse_std)
+                    
+        for entry in averages[rmv_a_key]:
+            clean_entry = entry.replace('␣', '').strip()
+            if 'nan' in clean_entry.lower():
+                rmv_mean.append(float('nan'))
+                rmv_std.append(float('nan'))
+            else:
+                match = re.match(r'([0-9.]+)\s*±\s*([0-9.]+)', clean_entry)
+                if match:
+                    rmv_mean.append(float(match.group(1)))
+                    rmv_std.append(float(match.group(2)))
+        
+        # Convert rmv_mean and rmv_std to numpy arrays
+        rmv_mean = np.array(rmv_mean)
+        rmv_std = np.array(rmv_std)
+        
+        return rmse_mean, rmse_std, rmv_mean, rmv_std
 
     def _combine_results(results):
         result_record = np.zeros((GRID_SEARCH_INFO[dataset]["num_trials"], 4, K))
@@ -260,80 +380,7 @@ def main(grid_search_info):
 
     for dataset, info in grid_search_info.items():
         for sigma_y in info['sigma_y']:
-            if dataset == 'ks':
-                from dapper.mods.KS import Model, Tplot
-                
-                KS = Model(dt=GRID_SEARCH_INFO[dataset]["dt"])
-                Nx = KS.Nx
-
-                # nRepeat=10
-                tseq = modelling.Chronology(GRID_SEARCH_INFO[dataset]["dt"], 
-                                            dto=GRID_SEARCH_INFO[dataset]["dto"], 
-                                            Ko=GRID_SEARCH_INFO[dataset]["ko"], 
-                                            BurnIn=1000, 
-                                            Tplot=Tplot)
-
-                Dyn = {
-                    "M": Nx,
-                    "model": KS.step,
-                    "linear": KS.dstep_dx,
-                    "noise": 0,
-                }
-
-                X0 = modelling.GaussRV(mu=KS.x0, C=1)
-
-                jj = GRID_SEARCH_INFO[dataset]["obs_inds"]
-                Obs = modelling.partial_Id_Obs(Nx, jj)
-                Obs["noise"] = sigma_y ** 2
-                Obs["localizer"] = nd_Id_localization((Nx,), (4,), jj)
-
-                HMM = modelling.HiddenMarkovModel(Dyn, Obs, tseq, X0)
-            elif dataset == 'lorenz96':
-                from dapper.mods.Lorenz96 import Tplot, dstep_dx, step, x0
-                
-                tseq = modelling.Chronology(GRID_SEARCH_INFO[dataset]["dt"], 
-                                            dto=GRID_SEARCH_INFO[dataset]["dto"], 
-                                            Ko=GRID_SEARCH_INFO[dataset]["ko"], 
-                                            Tplot=Tplot,
-                                            BurnIn=2 * Tplot)
-                Nx = 40
-                x0 = x0(Nx)
-                Dyn = {
-                    "M": Nx,
-                    "model": step,
-                    "linear": dstep_dx,
-                    "noise": 0,
-                }
-                X0 = modelling.GaussRV(mu=x0, C=0.1)
-                jj = GRID_SEARCH_INFO[dataset]["obs_inds"]
-                Obs = modelling.partial_Id_Obs(Nx, jj)
-                Obs["noise"] = sigma_y ** 2
-                Obs["localizer"] = nd_Id_localization((Nx,), (2,), jj)
-                HMM = modelling.HiddenMarkovModel(Dyn, Obs, tseq, X0)
-            elif dataset == 'lorenz63':
-                from dapper.mods.Lorenz63 import LPs, Tplot, dstep_dx, step, x0
-                tseq = modelling.Chronology(GRID_SEARCH_INFO[dataset]["dt"], 
-                                            dto=GRID_SEARCH_INFO[dataset]["dto"], 
-                                            Ko=GRID_SEARCH_INFO[dataset]["ko"], 
-                                            Tplot=Tplot, 
-                                            BurnIn=4 * Tplot)
-                Nx = len(x0)
-
-                Dyn = {
-                    "M": Nx,
-                    "model": step,
-                    "linear": dstep_dx,
-                    "noise": 0,
-                }
-
-                X0 = modelling.GaussRV(mu=x0,C=1)
-
-                jj = GRID_SEARCH_INFO[dataset]["obs_inds"]
-                Obs = modelling.partial_Id_Obs(Nx, jj)
-                Obs["noise"] = sigma_y ** 2  # modelling.GaussRV(C=CovMat(2*eye(Nx)))
-
-                HMM = modelling.HiddenMarkovModel(Dyn, Obs, tseq, X0)
-            
+            HMM = create_HMM(dataset, sigma_y)            
 
             for method_name in info['methods']:
 
