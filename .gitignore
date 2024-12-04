@@ -1,0 +1,5 @@
+# Ignore all subdirectories and their contents in the save folder
+save/*/
+
+# Do not ignore files directly in the save folder
+!save/*

@@ -1,0 +1,81 @@
+Start grid search for LETKF on ks with sigma_y = 1, ensemble size 5.
+Start grid search for LETKF on ks with sigma_y = 1, ensemble size 10.
+Start grid search for LETKF on ks with sigma_y = 1, ensemble size 15.
+Start grid search for LETKF on ks with sigma_y = 1, ensemble size 20.
+Start grid search for LETKF on ks with sigma_y = 1, ensemble size 40.
+Start grid search for LETKF on ks with sigma_y = 1, ensemble size 60.
+Start grid search for LETKF on ks with sigma_y = 1, ensemble size 100.
+Start grid search for EnKF_Sqrt on ks with sigma_y = 1, ensemble size 5.
+Start grid search for EnKF_Sqrt on ks with sigma_y = 1, ensemble size 10.
+Start grid search for EnKF_Sqrt on ks with sigma_y = 1, ensemble size 15.
+Start grid search for EnKF_Sqrt on ks with sigma_y = 1, ensemble size 20.
+Start grid search for EnKF_Sqrt on ks with sigma_y = 1, ensemble size 40.
+Start grid search for EnKF_Sqrt on ks with sigma_y = 1, ensemble size 60.
+Start grid search for EnKF_Sqrt on ks with sigma_y = 1, ensemble size 100.
+Start grid search for EnKF_PertObs on ks with sigma_y = 1, ensemble size 5.
+Start grid search for EnKF_PertObs on ks with sigma_y = 1, ensemble size 10.
+Start grid search for EnKF_PertObs on ks with sigma_y = 1, ensemble size 15.
+Start grid search for EnKF_PertObs on ks with sigma_y = 1, ensemble size 20.
+Start grid search for EnKF_PertObs on ks with sigma_y = 1, ensemble size 40.
+Start grid search for EnKF_PertObs on ks with sigma_y = 1, ensemble size 60.
+Start grid search for EnKF_PertObs on ks with sigma_y = 1, ensemble size 100.
+Start grid search for iEnKS on ks with sigma_y = 1, ensemble size 5.
+Start grid search for iEnKS on ks with sigma_y = 1, ensemble size 10.
+Start grid search for iEnKS on ks with sigma_y = 1, ensemble size 15.
+Start grid search for iEnKS on ks with sigma_y = 1, ensemble size 20.
+Start grid search for iEnKS on ks with sigma_y = 1, ensemble size 40.
+Start grid search for iEnKS on ks with sigma_y = 1, ensemble size 60.
+Start grid search for iEnKS on ks with sigma_y = 1, ensemble size 100.
+Start grid search for LETKF on ks with sigma_y = 0.7, ensemble size 5.
+Start grid search for LETKF on ks with sigma_y = 0.7, ensemble size 10.
+Start grid search for LETKF on ks with sigma_y = 0.7, ensemble size 15.
+Start grid search for LETKF on ks with sigma_y = 0.7, ensemble size 20.
+Start grid search for LETKF on ks with sigma_y = 0.7, ensemble size 40.
+Start grid search for LETKF on ks with sigma_y = 0.7, ensemble size 60.
+Start grid search for LETKF on ks with sigma_y = 0.7, ensemble size 100.
+Start grid search for EnKF_Sqrt on ks with sigma_y = 0.7, ensemble size 5.
+Start grid search for EnKF_Sqrt on ks with sigma_y = 0.7, ensemble size 10.
+Start grid search for EnKF_Sqrt on ks with sigma_y = 0.7, ensemble size 15.
+Start grid search for EnKF_Sqrt on ks with sigma_y = 0.7, ensemble size 20.
+Start grid search for EnKF_Sqrt on ks with sigma_y = 0.7, ensemble size 40.
+Start grid search for EnKF_Sqrt on ks with sigma_y = 0.7, ensemble size 60.
+Start grid search for EnKF_Sqrt on ks with sigma_y = 0.7, ensemble size 100.
+Start grid search for EnKF_PertObs on ks with sigma_y = 0.7, ensemble size 5.
+Start grid search for EnKF_PertObs on ks with sigma_y = 0.7, ensemble size 10.
+Start grid search for EnKF_PertObs on ks with sigma_y = 0.7, ensemble size 15.
+Start grid search for EnKF_PertObs on ks with sigma_y = 0.7, ensemble size 20.
+Start grid search for EnKF_PertObs on ks with sigma_y = 0.7, ensemble size 40.
+Start grid search for EnKF_PertObs on ks with sigma_y = 0.7, ensemble size 60.
+Start grid search for EnKF_PertObs on ks with sigma_y = 0.7, ensemble size 100.
+Start grid search for iEnKS on ks with sigma_y = 0.7, ensemble size 5.
+Start grid search for iEnKS on ks with sigma_y = 0.7, ensemble size 10.
+Start grid search for iEnKS on ks with sigma_y = 0.7, ensemble size 15.
+Start grid search for iEnKS on ks with sigma_y = 0.7, ensemble size 20.
+Start grid search for iEnKS on ks with sigma_y = 0.7, ensemble size 40.
+Start grid search for iEnKS on ks with sigma_y = 0.7, ensemble size 60.
+Start grid search for iEnKS on ks with sigma_y = 0.7, ensemble size 100.
+Traceback (most recent call last):
+  File "/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py", line 394, in <module>
+    main(GRID_SEARCH_INFO)
+  File "/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py", line 312, in main
+    trial_processed = _check_trial_processed(dataset, method_name, N, sigma_y)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py", line 217, in _check_trial_processed
+    df = pd.read_csv(file_path)
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bhchen/miniconda3/lib/python3.12/site-packages/pandas/io/parsers/readers.py", line 1026, in read_csv
+    return _read(filepath_or_buffer, kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bhchen/miniconda3/lib/python3.12/site-packages/pandas/io/parsers/readers.py", line 620, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bhchen/miniconda3/lib/python3.12/site-packages/pandas/io/parsers/readers.py", line 1620, in __init__
+    self._engine = self._make_engine(f, self.engine)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bhchen/miniconda3/lib/python3.12/site-packages/pandas/io/parsers/readers.py", line 1880, in _make_engine
+    self.handles = get_handle(
+                   ^^^^^^^^^^^
+  File "/home/bhchen/miniconda3/lib/python3.12/site-packages/pandas/io/common.py", line 873, in get_handle
+    handle = open(
+             ^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'save/benchmarks_lorenz96.csv'

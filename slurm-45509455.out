@@ -1,0 +1,126 @@
+Start grid search for LETKF on lorenz63 with sigma_y = 1, ensemble size 5.
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:58: RuntimeWarning: All-NaN slice encountered
+  max_value = np.nanmax(data)
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:80: RuntimeWarning: All-NaN slice encountered
+  cbar_ticks = np.linspace(np.nanmin(data), max_value, num=6)  # Generate ticks for original data range
+posx and posy should be finite values
+posx and posy should be finite values
+posx and posy should be finite values
+Error: All elements in result_avg[0, :] are NaN. Unable to determine the best RMSE index.
+Start grid search for LETKF on lorenz63 with sigma_y = 1, ensemble size 10.
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:58: RuntimeWarning: All-NaN slice encountered
+  max_value = np.nanmax(data)
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:80: RuntimeWarning: All-NaN slice encountered
+  cbar_ticks = np.linspace(np.nanmin(data), max_value, num=6)  # Generate ticks for original data range
+posx and posy should be finite values
+posx and posy should be finite values
+posx and posy should be finite values
+Error: All elements in result_avg[0, :] are NaN. Unable to determine the best RMSE index.
+Start grid search for LETKF on lorenz63 with sigma_y = 1, ensemble size 15.
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:58: RuntimeWarning: All-NaN slice encountered
+  max_value = np.nanmax(data)
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:80: RuntimeWarning: All-NaN slice encountered
+  cbar_ticks = np.linspace(np.nanmin(data), max_value, num=6)  # Generate ticks for original data range
+posx and posy should be finite values
+posx and posy should be finite values
+posx and posy should be finite values
+Error: All elements in result_avg[0, :] are NaN. Unable to determine the best RMSE index.
+Start grid search for LETKF on lorenz63 with sigma_y = 1, ensemble size 20.
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:58: RuntimeWarning: All-NaN slice encountered
+  max_value = np.nanmax(data)
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:80: RuntimeWarning: All-NaN slice encountered
+  cbar_ticks = np.linspace(np.nanmin(data), max_value, num=6)  # Generate ticks for original data range
+posx and posy should be finite values
+posx and posy should be finite values
+posx and posy should be finite values
+Error: All elements in result_avg[0, :] are NaN. Unable to determine the best RMSE index.
+Start grid search for LETKF on lorenz63 with sigma_y = 1, ensemble size 40.
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:58: RuntimeWarning: All-NaN slice encountered
+  max_value = np.nanmax(data)
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:80: RuntimeWarning: All-NaN slice encountered
+  cbar_ticks = np.linspace(np.nanmin(data), max_value, num=6)  # Generate ticks for original data range
+posx and posy should be finite values
+posx and posy should be finite values
+posx and posy should be finite values
+Error: All elements in result_avg[0, :] are NaN. Unable to determine the best RMSE index.
+Start grid search for LETKF on lorenz63 with sigma_y = 1, ensemble size 60.
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:58: RuntimeWarning: All-NaN slice encountered
+  max_value = np.nanmax(data)
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:80: RuntimeWarning: All-NaN slice encountered
+  cbar_ticks = np.linspace(np.nanmin(data), max_value, num=6)  # Generate ticks for original data range
+posx and posy should be finite values
+posx and posy should be finite values
+posx and posy should be finite values
+Error: All elements in result_avg[0, :] are NaN. Unable to determine the best RMSE index.
+Start grid search for LETKF on lorenz63 with sigma_y = 1, ensemble size 100.
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:58: RuntimeWarning: All-NaN slice encountered
+  max_value = np.nanmax(data)
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:80: RuntimeWarning: All-NaN slice encountered
+  cbar_ticks = np.linspace(np.nanmin(data), max_value, num=6)  # Generate ticks for original data range
+posx and posy should be finite values
+posx and posy should be finite values
+posx and posy should be finite values
+Error: All elements in result_avg[0, :] are NaN. Unable to determine the best RMSE index.
+Start grid search for LETKF on lorenz63 with sigma_y = 0.7, ensemble size 5.
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:58: RuntimeWarning: All-NaN slice encountered
+  max_value = np.nanmax(data)
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:80: RuntimeWarning: All-NaN slice encountered
+  cbar_ticks = np.linspace(np.nanmin(data), max_value, num=6)  # Generate ticks for original data range
+posx and posy should be finite values
+posx and posy should be finite values
+posx and posy should be finite values
+Error: All elements in result_avg[0, :] are NaN. Unable to determine the best RMSE index.
+Start grid search for LETKF on lorenz63 with sigma_y = 0.7, ensemble size 10.
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:58: RuntimeWarning: All-NaN slice encountered
+  max_value = np.nanmax(data)
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:80: RuntimeWarning: All-NaN slice encountered
+  cbar_ticks = np.linspace(np.nanmin(data), max_value, num=6)  # Generate ticks for original data range
+posx and posy should be finite values
+posx and posy should be finite values
+posx and posy should be finite values
+Error: All elements in result_avg[0, :] are NaN. Unable to determine the best RMSE index.
+Start grid search for LETKF on lorenz63 with sigma_y = 0.7, ensemble size 15.
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:58: RuntimeWarning: All-NaN slice encountered
+  max_value = np.nanmax(data)
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:80: RuntimeWarning: All-NaN slice encountered
+  cbar_ticks = np.linspace(np.nanmin(data), max_value, num=6)  # Generate ticks for original data range
+posx and posy should be finite values
+posx and posy should be finite values
+posx and posy should be finite values
+Error: All elements in result_avg[0, :] are NaN. Unable to determine the best RMSE index.
+Start grid search for LETKF on lorenz63 with sigma_y = 0.7, ensemble size 20.
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:58: RuntimeWarning: All-NaN slice encountered
+  max_value = np.nanmax(data)
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:80: RuntimeWarning: All-NaN slice encountered
+  cbar_ticks = np.linspace(np.nanmin(data), max_value, num=6)  # Generate ticks for original data range
+posx and posy should be finite values
+posx and posy should be finite values
+posx and posy should be finite values
+Error: All elements in result_avg[0, :] are NaN. Unable to determine the best RMSE index.
+Start grid search for LETKF on lorenz63 with sigma_y = 0.7, ensemble size 40.
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:58: RuntimeWarning: All-NaN slice encountered
+  max_value = np.nanmax(data)
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:80: RuntimeWarning: All-NaN slice encountered
+  cbar_ticks = np.linspace(np.nanmin(data), max_value, num=6)  # Generate ticks for original data range
+posx and posy should be finite values
+posx and posy should be finite values
+posx and posy should be finite values
+Error: All elements in result_avg[0, :] are NaN. Unable to determine the best RMSE index.
+Start grid search for LETKF on lorenz63 with sigma_y = 0.7, ensemble size 60.
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:58: RuntimeWarning: All-NaN slice encountered
+  max_value = np.nanmax(data)
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:80: RuntimeWarning: All-NaN slice encountered
+  cbar_ticks = np.linspace(np.nanmin(data), max_value, num=6)  # Generate ticks for original data range
+posx and posy should be finite values
+posx and posy should be finite values
+posx and posy should be finite values
+Error: All elements in result_avg[0, :] are NaN. Unable to determine the best RMSE index.
+Start grid search for LETKF on lorenz63 with sigma_y = 0.7, ensemble size 100.
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:58: RuntimeWarning: All-NaN slice encountered
+  max_value = np.nanmax(data)
+/central/groups/astuart/bhchen/DapperGridSearch/grid_search.py:80: RuntimeWarning: All-NaN slice encountered
+  cbar_ticks = np.linspace(np.nanmin(data), max_value, num=6)  # Generate ticks for original data range
+posx and posy should be finite values
+posx and posy should be finite values
+posx and posy should be finite values
+Error: All elements in result_avg[0, :] are NaN. Unable to determine the best RMSE index.
