@@ -1,5 +1,11 @@
-# Ignore all subdirectories and their contents in the save folder
-save/*/
+# Ignore all files and subdirectories in save/
+save/**
 
-# Do not ignore files directly in the save folder
+# Do not ignore files directly in save/ (not subdirectories)
 !save/*
+
+# Ignore all .out files in the current directory
+/*.out
+
+# Ignore all .sh files in the current directory
+/*.sh
