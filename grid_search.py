@@ -280,7 +280,7 @@ def create_HMM(dataset, sigma_y):
     else:
         raise ValueError(f"Unknown dataset: {dataset}")
 
-    return HMM
+    return HMM, tseq
 
 
 
@@ -292,6 +292,10 @@ def main(grid_search_info):
         
         with suppress_output():
             save_as = xps.launch(HMM, liveplots=False, save_as=f"noname_{trial_ind}")
+        
+        states, _ = HMM.simulate()
+        obs_states = states[tseq.kko]
+        obs_states_rms = np.mean(np.sqrt(np.mean(obs_states ** 2)))
 
         averages = dpr.stats.tabulate_avrgs([C.avrgs for C in xps])
         
@@ -348,22 +352,36 @@ def main(grid_search_info):
         rmv_mean = np.array(rmv_mean)
         rmv_std = np.array(rmv_std)
         
-        return rmse_mean, rmse_std, rmv_mean, rmv_std
+        rrmse_mean = rmse_mean / obs_states_rms
+        rrmse_std = rmse_std / obs_states_rms
+        
+        return rmse_mean, rmse_std, rmv_mean, rmv_std, rrmse_mean, rrmse_std
+
 
     def _combine_results(results):
-        result_record = np.zeros((GRID_SEARCH_INFO[dataset]["num_trials"], 4, K))
+        len_data = len(results[0])
+        
+        result_record = np.zeros((GRID_SEARCH_INFO[dataset]["num_trials"], len_data, K))
 
         for trial_ind, data in enumerate(results):
-            for i in range(4):
+            for i in range(len_data):
                 result_record[trial_ind, i, :] = data[i]
         
         valid_val_count = np.sum(~np.isnan(result_record), axis=0)
         safe_valid_val_count = np.where(valid_val_count == 0, 1, valid_val_count)
+        
+        # Store original result_record with NaNs
+        result_record_original = result_record.copy()
+        
+        # Replace NaNs with zeros for mean calculation
         result_record[np.isnan(result_record)] = 0
         result_avg = np.sum(result_record, axis=0) / safe_valid_val_count
         result_avg[valid_val_count == 0] = np.nan
-
-        return result_avg, valid_val_count[0, :]
+        
+        # Calculate standard deviation using numpy's nanstd function
+        result_std = np.nanstd(result_record_original, axis=0, ddof=1)
+        
+        return result_avg, result_std, valid_val_count[0, :]
 
     def _check_trial_processed(dataset, method_name, N, sigma_y):
         file_path = os.path.join("save", f"benchmarks_{dataset}.csv")
@@ -380,7 +398,7 @@ def main(grid_search_info):
 
     for dataset, info in grid_search_info.items():
         for sigma_y in info['sigma_y']:
-            HMM = create_HMM(dataset, sigma_y)            
+            HMM, tseq = create_HMM(dataset, sigma_y)            
 
             for method_name in info['methods']:
 
@@ -431,6 +449,7 @@ def main(grid_search_info):
                         saved_data = np.load(data_save_path)
 
                         result_avg = saved_data['result_avg']
+                        result_std = saved_data['result_std']
                         valid_val_count = saved_data['valid_val_count']
                         infl_list = saved_data['infl_list'].tolist()
                         loc_rad_list = saved_data['loc_rad_list'].tolist()
@@ -439,31 +458,36 @@ def main(grid_search_info):
                         
                         K = len(xps)
                         
-                        results = Parallel(n_jobs=-1)(delayed(_process_trial)(trial_ind) for trial_ind in range(GRID_SEARCH_INFO[dataset]["num_trials"]))
-                        result_avg, valid_val_count = _combine_results(results)
+                        results = Parallel(n_jobs=-1)(delayed(_process_trial)(trial_ind, tseq) for trial_ind in range(GRID_SEARCH_INFO[dataset]["num_trials"]))
+                        result_avg, result_std, valid_val_count = _combine_results(results)
 
                         data_save_path = os.path.join('save', 'data', f'{dataset}_{method_name}_{N}_{sigma_y}_results.npz')
-                        np.savez(data_save_path, result_avg=result_avg, valid_val_count=valid_val_count, infl_list=infl_list, loc_rad_list=loc_rad_list)
+                        np.savez(data_save_path, 
+                                 result_avg=result_avg, 
+                                 result_std=result_std,
+                                 valid_val_count=valid_val_count, 
+                                 infl_list=infl_list, 
+                                 loc_rad_list=loc_rad_list)
 
                     if loc_rad_list:
-                        rmse_avg_grid = result_avg[0, :].reshape(len(infl_list), len(loc_rad_list))
-                        img_save_path = os.path.join('save', 'figures_new', f'{dataset}_{method_name}_{N}_{sigma_y}_gridsearch.png')
+                        rmse_avg_grid = result_avg[4, :].reshape(len(infl_list), len(loc_rad_list))
+                        img_save_path = os.path.join('save', 'figures', f'{dataset}_{method_name}_{N}_{sigma_y}_gridsearch.png')
                         img_title = f"{method_name} Grid Search with Ensemble Size {N}"
                         plot_heatmap_with_nan(rmse_avg_grid, infl_list, loc_rad_list, save_path=img_save_path, img_title=img_title)
                     else:
-                        rmse_avg_grid = result_avg[0, :]
-                        img_save_path = os.path.join('save', 'figures_new', f'{dataset}_{method_name}_{N}_{sigma_y}_gridsearch.png')
+                        rmse_avg_grid = result_avg[4, :]
+                        img_save_path = os.path.join('save', 'figures', f'{dataset}_{method_name}_{N}_{sigma_y}_gridsearch.png')
                         img_title = f"{method_name} Parameter Search with Ensemble Size {N}"
                         plot_simple(infl_list, rmse_avg_grid, save_path=img_save_path, img_title=img_title)
                         
                     exp_info, _, _ = xps.prep_table()
 
-                    # Check if the entire result_avg[0, :] is NaN
-                    if np.all(np.isnan(result_avg[0, :])):
-                        print("Error: All elements in result_avg[0, :] are NaN. Unable to determine the best RMSE index.")
+                    # Check if the entire result_avg[4, :] is NaN
+                    if np.all(np.isnan(result_avg[4, :])):
+                        print("Error: All elements in result_avg[4, :] are NaN. Unable to determine the best RMSE index.")
                         best_rmse_ind = 0  # Assign a default value or handle this case appropriately
                     else:
-                        best_rmse_ind = np.nanargmin(result_avg[0, :])  # Find index of minimum non-NaN value
+                        best_rmse_ind = np.nanargmin(result_avg[4, :])  # Find index of minimum non-NaN value
                     
                     
                     if loc_rad_list:
@@ -476,18 +500,27 @@ def main(grid_search_info):
                     else:
                         nan_exist = False
 
-                    df = pd.DataFrame({
+                    # Define lists of metrics and their types
+                    metric_names = ["rmse", "rmse_std", "rmv_mean", "rmv_std", "rrmse_mean", "rrmse_std"]
+                    
+                    # Initialize an empty dictionary for DataFrame
+                    df_dict = {
                         "method": [method_name],
                         "N": [N],
                         "sigma_y": [sigma_y],
                         "best_loc_rad": [best_loc_rad],
                         "best_infl": [exp_info['infl'][best_rmse_ind]],
-                        "rmse_mean": [result_avg[0, best_rmse_ind]],
-                        "rmse_std": [result_avg[1, best_rmse_ind]],
-                        "rmv_mean": [result_avg[2, best_rmse_ind]],  
-                        "rmv_std": [result_avg[3, best_rmse_ind]],
-                        "nan_exist": nan_exist     
-                    })
+                        "nan_exist": nan_exist
+                    }
+
+                    # Add metrics data to dictionary dynamically
+                    for i, metric in enumerate(metric_names):
+                        df_dict[f"{metric}"] = [result_avg[i, best_rmse_ind]]
+                        df_dict[f"{metric}_dstd"] = [result_std[i, best_rmse_ind]]
+                    
+                    df = pd.DataFrame(df_dict)
+
+                    csv_file = os.path.join("save", f"benchmarks_{dataset}.csv")
                     
                     if not trial_processed:
                         csv_file = os.path.join("save", f"benchmarks_{dataset}.csv")
