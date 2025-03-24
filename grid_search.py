@@ -285,17 +285,16 @@ def create_HMM(dataset, sigma_y):
 
 
 def main(grid_search_info):
-    def _process_trial(trial_ind):
+    def _process_trial(trial_ind, tseq):
         # with suppress_output():
         for xp in xps:
             xp.seed = trial_ind + 1
         
         with suppress_output():
             save_as = xps.launch(HMM, liveplots=False, save_as=f"noname_{trial_ind}")
-        
-        states, _ = HMM.simulate()
-        obs_states = states[tseq.kko]
-        obs_states_rms = np.mean(np.sqrt(np.mean(obs_states ** 2)))
+            states, _ = HMM.simulate()
+            obs_states = states[tseq.kko]
+            obs_states_rms = np.mean(np.sqrt(np.mean(obs_states ** 2)))
 
         averages = dpr.stats.tabulate_avrgs([C.avrgs for C in xps])
         
