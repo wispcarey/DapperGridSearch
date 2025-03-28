@@ -33,7 +33,8 @@ KS_LOC = {5: [0.001,] + [i for i in range(1,11,1)],
 
 GRID_SEARCH_INFO["ks"] = {
        "sigma_y":[1, 0.7],  
-       "methods":["LETKF", "EnKF_Sqrt", "EnKF_PertObs", "iEnKS"],
+       # "methods":["LETKF", "EnKF_Sqrt", "EnKF_PertObs", "iEnKS"],
+       "methods":["iEnKF"],
        "N_list":[5,10,15,20,40,60,100],
        "infl_list":KS_INFL,
        "letkf_infl_list":KS_INFL_LETKF,
@@ -76,7 +77,8 @@ L96_LOC = {5: [0.001,] + [i for i in range(1,11,1)],
 
 GRID_SEARCH_INFO["lorenz96"] = {
        "sigma_y":[1, 0.7], 
-       "methods":["LETKF", "EnKF_Sqrt", "EnKF_PertObs", "iEnKS"],
+       # "methods":["LETKF", "EnKF_Sqrt", "EnKF_PertObs", "iEnKS"],
+       "methods":["iEnKF"],
        "N_list":[5,10,15,20,40,60,100],
        "infl_list":L96_INFL,
        "letkf_infl_list":L96_INFL_LETKF,
@@ -99,7 +101,8 @@ L63_INFL = {5: [1 + 0.05*i for i in range(11)],
            }
 GRID_SEARCH_INFO["lorenz63"] = {
        "sigma_y":[1, 0.7], 
-       "methods":["EnKF_Sqrt", "EnKF_PertObs", "iEnKS"],
+       # "methods":["EnKF_Sqrt", "EnKF_PertObs", "iEnKS"],
+       "methods":["iEnKF"],
        "N_list":[5,10,15,20,40,60,100],
        "infl_list":L63_INFL,
        "loc_rad_list":[],
