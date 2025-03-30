@@ -439,6 +439,8 @@ def main(grid_search_info):
                                 xps += da.iEnKS("Sqrt", N=N , infl=infl, Lag=2)
                             if method_name == 'iEnKF':
                                 xps += da.iEnKS("Sqrt", N=N , infl=infl, Lag=1)
+                            if method_name == 'iEnKF_PertObs':
+                                xps += da.iEnKS("PertObs", N=N , infl=infl, Lag=1)
                             elif method_name == 'EnKF_PertObs':
                                 xps += da.EnKF("PertObs", N=N, infl=infl)
                             elif method_name == 'EnKF_Sqrt':
