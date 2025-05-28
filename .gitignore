@@ -1,15 +1,149 @@
-# Ignore everything in the save folder recursively
-save/**
+# # Ignore everything in the save folder recursively
+# save/**
 
-# Do not ignore files directly in the save folder
-!save/*
+# # Do not ignore files directly in the save folder
+# !save/*
 
-# Ignore all subdirectories and their contents in the save folder
-save/*/
-
+# # Ignore all subdirectories and their contents in the save folder
+# # This will ensure that only files directly under 'save/' are tracked,
+# # and any subdirectory within 'save/' is ignored.
+# save/*/
 
 # Ignore all .out files in the current directory
 /*.out
 
 # Ignore all .sh files in the current directory
 /*.sh
+
+### Python ###
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib60/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+# Usually these files are created by a CI server and not deployed directly
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Poetry
+# poetry.lock is usually committed, but if you have a team policy against it
+# poetry.lock
+# .pdm.toml
+# .pdm.lock
+# pyproject.toml is usually committed
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyderworkspace
+
+# Rope project settings
+.ropeproject
+
+# Pyright
+.pyrightconfig.json
+pyrightconfig.json
+
+# Jupyter Notebook
+.ipynb_checkpoints
+profile_default/
+ipython_config.py
+
+# VSCode
+.vscode/
+
+# PyCharm
+.idea/
+*.iml
+
+# Other
+*.pid
+*.pid.lock
+*.seed
+*.cfg # if it's not a template or meant to be shared
+*.env.* # for environment-specific .env files like .env.local
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# If you have a `local_requirements.txt` or similar for local overrides
+local_requirements.txt

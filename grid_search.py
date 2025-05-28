@@ -230,7 +230,7 @@ def create_HMM(dataset, sigma_y):
             BurnIn=2 * Tplot
         )
         
-        Nx = 40
+        Nx = GRID_SEARCH_INFO[dataset]["Nx"]
         x0 = x0(Nx)
 
         Dyn = {
@@ -425,7 +425,7 @@ def main(grid_search_info):
                             loc_rad_list = info['loc_rad_list'].get(N, [])
                     else:
                         loc_rad_list = []
-                        
+                    
                     trial_processed = _check_trial_processed(dataset, method_name, N, sigma_y)
 
                     xps = dpr.xpList()
